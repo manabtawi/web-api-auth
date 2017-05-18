@@ -1,7 +1,7 @@
 # Part 1: Create the Main Solution
 - From Visual Studio 2017 create new solution `ASP.NET Web Application .NET Framework`.
 - Choose **Web API** from the template box.
-- Change the Authetication to **Individual Account User Accounts**
+- Change the Authetication to **Individual User Accounts**
 - Click OK
 
 # Part 2: Force HTTPs
@@ -71,3 +71,41 @@ using System.Web.Http.Filters;
 - Press F5 and you will notice the local IIS runs the project URL with HTTPs.
 
 *Be noted that some browsers might not verify the SSL running by local ISS and it will ask from user to accept the risk. This can be configured by creating self-signed certificate, or will run proporly on production level if your domain supports SSL from a trusted authority*
+
+# Part 3: Authorization
+We will make the authorization the Values API which is default controller added automatically when project created.
+- Go to ValuesController and add `[Authorize]` attribute at the top of the class:
+```
+[Authorize]
+public class ValuesController : ApiController
+{
+        ...
+```
+- Press F5 to run the application
+- From REST client tool:
+  - Register a user first
+  ```
+        POST /api/account/register HTTP/1.1
+        Host: (PROJECT URL)
+        Content-Type: application/json
+        
+        Request Body:
+        {
+                "email" : "user1@example.com",
+                "password" : "P@ssw0rd",
+                "confirmpassword" : "P@ssw0rd"
+        }
+  ```
+  - Generate Token:
+  ```
+        POST /token HTTP/1.1
+        Host: (PROJECT URL)
+        Content-Type: application/x-www-form-urlencoded
+        Request Body: username=user1@0example.com&password=P@0ssw0rd&grant_type=password
+  ```
+  - Call Values API:
+  ```
+        GET /api/values HTTP/1.1
+        Host: (PROJECT URL)
+        Authorization: Bearer TOKEN_HERE
+  ```
